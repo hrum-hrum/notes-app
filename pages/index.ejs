@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes app</title>
+</head>
+
+<body>
+    <h1>Notes app</h1>
+
+    <header>
+        <%- include('./layouts/header') %>
+    </header>
+
+    <body>
+       
+        <main>
+            <%- include('newNote') %>
+                <%- include('list') %>
+        </main>
+    </body>
+    <footer>
+        <%- include('./layouts/footer') %>
+    </footer>
+    
+</body>
+
+</html>

@@ -1,0 +1,109 @@
+<ul class="notesList">
+    <% notes.forEach(note=> { %>
+        <li data-id="<%= note.id %>">
+            <div class="infoBlock">
+                <span class="liNoteTitle">
+                    <%= note.title %>
+                </span>
+                <button type="button" class="editNote">Редактировать</button>
+                <button type="button" class="removeNote">x</button>
+            </div>
+            <div class="editBlock" style="display: none;">
+                <input type="text" name="title" value="<%= note.title %>">
+                <button type="button" class="saveNote">Сохранить</button>
+                <button type="button" class="cancelEdit">Отмена</button>
+            </div>
+        </li>
+        <% }) %>
+</ul>
+<script>
+    (function () {
+        const removeNote = async (id) => {
+            await fetch(`/${id}`, { method: 'DELETE' })
+            try {
+                const response = await fetch(`/${id}`, {
+                    method: 'DELETE' // Используем метод DELETE
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete resource');
+                }
+
+                console.log('Resource deleted successfully');
+                return true;
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        const saveNote = async (id, title) => {
+
+            try {
+                const response = await fetch(`/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ title: title }) // Отправляем данные в формате JSON
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update resource');
+                }
+
+                console.log('Resource updated successfully');
+                return true;
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const liItems = document.querySelectorAll('.notesList li')
+            if (liItems.length) {
+                liItems.forEach(li => {
+
+                    const id = li.getAttribute('data-id');
+
+                    const deleteBtn = li.querySelector('.removeNote');
+                    deleteBtn.addEventListener('click', async () => {
+                        //alert(id);
+                        if (await removeNote(id)) {
+                            deleteBtn.closest('li').remove();
+                        }
+                    });
+
+                    const editBlock = li.querySelector('.editBlock');
+                    const infoBlock = li.querySelector('.infoBlock');
+                    const editBtn = li.querySelector('.editNote');
+                    editBtn.addEventListener('click', () => {
+                        infoBlock.style.display = 'none';
+                        editBlock.style.display = 'block';
+                    });
+
+                    const cancelBtn = editBlock.querySelector('.cancelEdit');
+                    cancelBtn.addEventListener('click', () => {
+                        editBlock.style.display = 'none';
+                        infoBlock.style.display = 'block';
+                    });
+
+                    const saveBtn = editBlock.querySelector('.saveNote');
+                    const liNoteTitle = li.querySelector('.liNoteTitle');
+                    saveBtn.addEventListener('click', async () => {
+                        const title = editBlock.querySelector('input[name="title"]').value;
+
+                        await saveNote(id, title);
+
+                        liNoteTitle.textContent = title;
+                        editBlock.style.display = 'none';
+                        infoBlock.style.display = 'block';
+                    });
+                })
+
+            }
+        });
+
+    })()
+</script>
